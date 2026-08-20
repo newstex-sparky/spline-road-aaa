@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { WebGPURenderer } from 'three/webgpu';
 import { CameraController } from './camera/CameraController.ts';
+import { installSplineDebug } from './debug/splineDebug.ts';
 import { createGrassBladeField, type GrassBladeField } from './grass/GrassBladeField.ts';
 import { updateTerrainZoomBlend } from './grass/GrassLodConfig.ts';
 import { computeForestTreePlacements, type ForestTreePlacement } from './props/forestPlacements.ts';
@@ -226,6 +227,17 @@ class RoadNetworkEditorApp {
     window.addEventListener('resize', this.onResize);
     this.animate();
     void this.loadSourceEnvironment();
+    installSplineDebug({
+      map: this.map,
+      network: this.network,
+      riverField: this.riverField,
+      residenceSystem: this.residenceSystem,
+      residenceTool: this.residenceTool,
+      roadRenderer: this.roadRenderer,
+      camera: this.camera,
+      getFps: () => Number.parseFloat(this.fpsLabel.textContent ?? '0') || 0,
+      getZoomPercent: () => this.lastZoomPercent,
+    });
   }
 
   private addLighting(): THREE.DirectionalLight {

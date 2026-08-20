@@ -114,6 +114,24 @@ export class ResidenceTool {
     return this.stage > 0;
   }
 
+  /** Read-only draft introspection for the automation harness. */
+  getDraft(): {
+    stage: number;
+    frontagePoints: Array<[number, number, number]>;
+    frontageCenters: Array<[number, number, number]>;
+    rearPoints: Array<[number, number, number]>;
+    lockedSide: 1 | -1 | null;
+  } | null {
+    if (this.stage === 0) return null;
+    return {
+      stage: this.stage,
+      frontagePoints: this.frontagePoints.map((point) => [point.x, point.y, point.z]),
+      frontageCenters: this.frontageCenters.map((point) => [point.x, point.y, point.z]),
+      rearPoints: this.rearPoints.map((point) => [point.x, point.y, point.z]),
+      lockedSide: this.lockedSide,
+    };
+  }
+
   isDraftBuildable(): boolean {
     return this.stage >= 4 && Boolean(this.layout) && !this.validationMessage;
   }
