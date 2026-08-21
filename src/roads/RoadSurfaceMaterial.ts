@@ -255,7 +255,25 @@ export function createRoadEdgeMaterial(
   material.polygonOffsetFactor = -1;
   material.polygonOffsetUnits = -2;
   const edgeColor = buildRoadColorNode(textures, 0.78, ROAD_DIRT_EDGE_REFERENCE_TINT);
-  material.colorNode = applyRoadWeatherColor(edgeColor, weather, 1.12);
+  // Trodden dirt shoulder: the outermost edge-fade band (edgeFade near zero)
+  // reads as bare, packed earth. Darken and desaturate it progressively as the
+  // feather reaches its outer tip so the road wears into the grass instead of
+  // ending at a clean painted line.
+  const edgeFadeAttr = attribute('edgeFade', 'float') as TslNode;
+  const shoulderWearMask = sub(
+    float(1) as TslNode,
+    smoothstep(
+      float(0.02) as TslNode,
+      float(0.42) as TslNode,
+      edgeFadeAttr,
+    ) as TslNode,
+  ) as TslNode;
+  const wornEdgeColor = mix(
+    edgeColor,
+    edgeColor.mul(vec3(0.82, 0.78, 0.7) as TslNode) as TslNode,
+    shoulderWearMask.mul(float(0.5) as TslNode),
+  ) as TslNode;
+  material.colorNode = applyRoadWeatherColor(wornEdgeColor, weather, 1.12);
   const edgeRoughness = (texture(textures.roughness, uv() as TslNode) as TslNode).r;
   material.roughnessNode = applyRoadWeatherRoughness(edgeRoughness, weather);
   let opacity = buildBankOpacityNode(textures);

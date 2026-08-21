@@ -31,7 +31,7 @@ import {
 
 /** Matches placed-road centerline sampling in `sampleEdge`. */
 export const ROAD_PLACED_SAMPLE_SPACING = 1.15;
-const OUTER_EDGE_JITTER_RATIO = 0.52 / ROAD_WIDTH;
+const OUTER_EDGE_JITTER_RATIO = 0.62 / ROAD_WIDTH;
 /** How far the feathered shoulder extends under the opaque core, relative to width. */
 const BLEND_INNER_OVERLAP_RATIO = 0.14 / ROAD_WIDTH;
 const ROAD_CAP_SEGMENTS = 20;
@@ -693,7 +693,10 @@ export class RoadMeshBuilder {
     const indices: number[] = [];
     const distances = cumulativeDistances(path);
     const shoulderMid = width * 0.48;
-    const shoulderOuter = width * 0.92;
+    // Wider, softer feather: the outer strip now extends well past the core
+    // edge (1.15 widths vs 0.92) so the analytic edgeFade falls off gradually
+    // into the grass instead of meeting it at a crisp line.
+    const shoulderOuter = width * 1.15;
     const outerEdgeJitter = width * OUTER_EDGE_JITTER_RATIO;
     const innerOverlap = width * BLEND_INNER_OVERLAP_RATIO;
 

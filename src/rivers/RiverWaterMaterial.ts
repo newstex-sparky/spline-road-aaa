@@ -48,14 +48,14 @@ type ScalarUniform = TslNode & {
 };
 
 const riverNightAmount = uniform(0) as ScalarUniform;
-const WATER_FOAM_COLOR = vec3(0.43, 0.61, 0.56) as TslNode;
-const MENISCUS_COLOR = vec3(0.46, 0.64, 0.59) as TslNode;
-const SHALLOW_WATER_TINT = vec3(0.145, 0.46, 0.44) as TslNode;
-const DEEP_WATER_TINT = vec3(0.055, 0.165, 0.14) as TslNode;
-const DEEP_WATER_LIGHT_TINT = vec3(0.085, 0.225, 0.195) as TslNode;
+const WATER_FOAM_COLOR = vec3(0.34, 0.44, 0.42) as TslNode;
+const MENISCUS_COLOR = vec3(0.3, 0.4, 0.39) as TslNode;
+const SHALLOW_WATER_TINT = vec3(0.19, 0.29, 0.28) as TslNode;
+const DEEP_WATER_TINT = vec3(0.05, 0.13, 0.12) as TslNode;
+const DEEP_WATER_LIGHT_TINT = vec3(0.08, 0.19, 0.17) as TslNode;
 const SHORE_LAP_MAX = 0.11;
-const SHORE_FOAM_MAX = 0.16;
-const FLOW_WAVE_HEIGHT = 0.048;
+const SHORE_FOAM_MAX = 0.12;
+const FLOW_WAVE_HEIGHT = 0.058;
 export const RIVER_WATER_TRANSMISSION = 0.88;
 export const RIVER_WATER_ATTENUATION_DISTANCE = 2.6;
 export const RIVER_DEEP_BACKDROP_STABILITY = 1;
@@ -63,8 +63,8 @@ export const RIVER_VISUAL_SHORE_EXPONENT = 3.8;
 export const RIVER_OPTICAL_SHORE_EXPONENT = 2;
 export const RIVER_BANK_BED_REVEAL = 0.72;
 export const RIVER_FLOW_ROUGHNESS_FLOOR = 0.315;
-export const RIVER_FLOW_HIGHLIGHT_STRENGTH = 0.2;
-export const RIVER_SKY_RETURN_STRENGTH = 0.16;
+export const RIVER_FLOW_HIGHLIGHT_STRENGTH = 0.22;
+export const RIVER_SKY_RETURN_STRENGTH = 0.3;
 
 function decodeFlowDirection(shoreSample: TslNode): { flowDirX: TslNode; flowDirZ: TslNode } {
   const flowRaw = (vec2(shoreSample.b, shoreSample.a) as TslNode).mul(float(2) as TslNode).sub(float(1) as TslNode) as TslNode;
@@ -172,10 +172,10 @@ function buildRiverWaterShaderNodes(shoreMaps: RiverWaterShoreMaps) {
   const foamStrength = min(
     float(SHORE_FOAM_MAX) as TslNode,
     (pow(shallowFactor, float(1.05) as TslNode) as TslNode).mul(
-      (float(0.025) as TslNode)
-        .add(foamNoise.mul(0.11))
-        .add(foamWave.mul(0.07))
-        .add(foamPulse.mul(0.05)) as TslNode,
+      (float(0.02) as TslNode)
+        .add(foamNoise.mul(0.09))
+        .add(foamWave.mul(0.06))
+        .add(foamPulse.mul(0.04)) as TslNode,
     ) as TslNode,
   ) as TslNode;
 
@@ -199,11 +199,11 @@ function buildRiverWaterShaderNodes(shoreMaps: RiverWaterShoreMaps) {
   const ribbonCrestB = pow(ribbonCarrierB, float(7) as TslNode) as TslNode;
   const flowStructure = ribbonCrestA
     .mul(pow(alongBreakupA, float(1.65) as TslNode) as TslNode)
-    .mul(float(0.68) as TslNode)
+    .mul(float(0.62) as TslNode)
     .add(
       ribbonCrestB
         .mul(pow(alongBreakupB, float(1.9) as TslNode) as TslNode)
-        .mul(float(0.32) as TslNode) as TslNode,
+        .mul(float(0.38) as TslNode) as TslNode,
     ) as TslNode;
   const flowShimmer = depthFactor
     .mul(flowStructure)
@@ -227,7 +227,7 @@ function buildRiverWaterShaderNodes(shoreMaps: RiverWaterShoreMaps) {
   const bedTint = bedNoiseA.mul(0.58).add(bedNoiseB.mul(0.42)) as TslNode;
   const layeredDeepTint = mix(DEEP_WATER_TINT, DEEP_WATER_LIGHT_TINT, bedTint) as TslNode;
   const waterTint = mix(layeredDeepTint, SHALLOW_WATER_TINT, bankBedReveal) as TslNode;
-  const flowHighlight = vec3(0.34, 0.56, 0.54) as TslNode;
+  const flowHighlight = vec3(0.28, 0.4, 0.39) as TslNode;
   const tintedBody = mix(waterTint, flowHighlight, flowShimmer) as TslNode;
   const bodyColor = mix(tintedBody, WATER_FOAM_COLOR, foamStrength) as TslNode;
   const meniscusBody = mix(bodyColor, MENISCUS_COLOR, meniscus) as TslNode;
@@ -236,12 +236,12 @@ function buildRiverWaterShaderNodes(shoreMaps: RiverWaterShoreMaps) {
     float(0.95) as TslNode,
   ) as TslNode).mul(float(RIVER_SKY_RETURN_STRENGTH) as TslNode) as TslNode;
   const surfaceReturn = min(
-    float(0.22) as TslNode,
-    skyReturn.add(flowStructure.mul(float(0.05) as TslNode) as TslNode) as TslNode,
+    float(0.2) as TslNode,
+    skyReturn.add(flowStructure.mul(float(0.06) as TslNode) as TslNode) as TslNode,
   ) as TslNode;
   const colorNode = mix(
     meniscusBody,
-    vec3(0.31, 0.38, 0.41) as TslNode,
+    vec3(0.235, 0.305, 0.315) as TslNode,
     surfaceReturn,
   ) as TslNode;
   const bedColor = mix(

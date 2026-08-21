@@ -55,7 +55,11 @@ export const TERRAIN_SNOW_TEXTURE_WEIGHT = 0.54;
 export const TERRAIN_SNOW_MAX_COVERAGE = 0.96;
 export const TERRAIN_SHORE_RAIN_FADE_START = 0.08;
 export const TERRAIN_SHORE_RAIN_FADE_END = 0.72;
-export const TERRAIN_SHORE_BLEND_FLOOR = 0.045;
+export const TERRAIN_SHORE_BLEND_FLOOR = 0.03;
+/** Ceiling of the shore ramp: mud saturates sooner and the falloff mid-point
+ * rides ~25% further up the bank, so the shoreline reads as a broad muddy
+ * apron instead of a crisp edge. */
+export const TERRAIN_SHORE_BLEND_REACH = 0.94;
 export const TERRAIN_ROAD_WEAR_BLEND_FLOOR = 0.055;
 
 export function stableTerrainBlendWeight(
@@ -914,9 +918,11 @@ export function createTerrainGrassMaterialWithRiverShore(
   // Drop interpolation residue to a true zero, then ease the authored mask
   // over its full remaining range. Sublinear powers amplify near-zero vertex
   // tails and collapse them into dotted one-pixel rings at overview zoom.
+  // The ramp ceiling is lowered so mud coverage reaches further up the bank
+  // and the tail is softer instead of ending in a crisp dirt line.
   const shoreBlend = smoothstep(
     float(TERRAIN_SHORE_BLEND_FLOOR) as TslNode,
-    float(1) as TslNode,
+    float(TERRAIN_SHORE_BLEND_REACH) as TslNode,
     shoreBlendRaw,
   ) as TslNode;
   const roadWearRaw = attribute('roadWearBlend', 'float') as TslNode;
