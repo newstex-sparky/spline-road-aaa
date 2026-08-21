@@ -1,0 +1,14 @@
+{
+  "pair1": {
+    "left_is_build": true,
+    "left": "/home/newstex/workspace/spline-road-aaa/shots/scene/06-overview-full.png",
+    "right": "/home/newstex/workspace/spline-road-aaa/refs/frame-0.6s.png",
+    "A_left": true
+  },
+  "pair2": {
+    "left_is_build": false,
+    "left": "/home/newstex/workspace/spline-road-aaa/refs/frame-13.7s.png",
+    "right": "/home/newstex/workspace/spline-road-aaa/shots/iter1-bridge/bridge-railing-mid.png",
+    "A_left": true
+  }
+}
