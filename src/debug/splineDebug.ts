@@ -5,6 +5,7 @@ import type { RoadNetwork } from '../roads/RoadNetwork.ts';
 import type { ResidenceSystem } from '../residences/ResidenceSystem.ts';
 import type { ResidenceTool } from '../residences/ResidenceTool.ts';
 import type { RoadRenderer } from '../roads/RoadRenderer.ts';
+import type { CameraController } from '../camera/CameraController.ts';
 
 /**
  * Read-only debug/automation bridge exposed as `window.__splineDebug`.
@@ -26,6 +27,7 @@ export type SplineDebugBridge = {
   isWet: (x: number, z: number) => boolean;
   terrainHeight: (x: number, z: number) => number;
   project: (x: number, z: number) => { x: number; y: number; z: number } | null;
+  frame: (x: number, z: number, yawDeg?: number, pitchDeg?: number, distance?: number) => void;
   residenceDraft: () => ReturnType<ResidenceTool['getDraft']>;
   stats: () => {
     roads: number;
@@ -44,6 +46,7 @@ export function installSplineDebug(options: {
   residenceSystem: ResidenceSystem;
   residenceTool: ResidenceTool;
   roadRenderer: RoadRenderer;
+  cameraController: CameraController;
   camera: THREE.PerspectiveCamera;
   getFps: () => number;
   getZoomPercent: () => number;
@@ -55,6 +58,7 @@ export function installSplineDebug(options: {
     residenceSystem,
     residenceTool,
     roadRenderer,
+    cameraController,
     camera,
     getFps,
     getZoomPercent,
@@ -93,6 +97,9 @@ export function installSplineDebug(options: {
       };
     },
     residenceDraft: () => residenceTool.getDraft(),
+    frame: (x, z, yawDeg = -38, pitchDeg = 14, distance = 70) => {
+      cameraController.applyShowcaseView(x, z, THREE.MathUtils.degToRad(yawDeg), THREE.MathUtils.degToRad(pitchDeg), distance);
+    },
     stats: () => {
       const bridges = [...network.edges.values()]
         .reduce((total, edge) => total + (edge.materialData?.bridgeSpans?.length ?? 0), 0);

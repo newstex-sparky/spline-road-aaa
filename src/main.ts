@@ -234,6 +234,7 @@ class RoadNetworkEditorApp {
       residenceSystem: this.residenceSystem,
       residenceTool: this.residenceTool,
       roadRenderer: this.roadRenderer,
+      cameraController: this.cameraController,
       camera: this.camera,
       getFps: () => Number.parseFloat(this.fpsLabel.textContent ?? '0') || 0,
       getZoomPercent: () => this.lastZoomPercent,

@@ -67,7 +67,7 @@ export const GRASS_BLADE_NEAR_RADIUS_FIRST_PERSON = 46;
 export const GRASS_BLADE_CHUNK_SIZE = 8;
 
 /** Target tufts scattered per chunk (organic placement, not a rigid grid). */
-export const GRASS_TUFTS_PER_CHUNK = 96;
+export const GRASS_TUFTS_PER_CHUNK = 104;
 
 /** Extra scatter attempts budget per chunk. */
 export const GRASS_TUFT_SCATTER_ATTEMPTS = GRASS_TUFTS_PER_CHUNK + 56;
@@ -115,7 +115,14 @@ export const REED_LOD_OPACITY_POWER = 2;
  * opacity keeps their alpha-tested cards subtle at the beginning of the blend.
  */
 export const GRASS_BLADE_LOD_VISIBILITY_THRESHOLD = 0;
-export const GRASS_BLADE_LOD_OPACITY_POWER = 1.35;
+
+/**
+ * Opacity curve exponent for the grass LOD fade. Below 1 the fade starts
+ * visibly earlier and changes more gradually, so the alpha-hash coverage
+ * melts in over a wider zoom band instead of popping as the terrain beneath
+ * it is revealed all at once.
+ */
+export const GRASS_BLADE_LOD_OPACITY_POWER = 0.9;
 
 /**
  * Keep the streamed meshes alive across a very small opacity dead-band.

@@ -1056,11 +1056,16 @@ function* generateSeedThreeChunkInstances(
     if (micro) microPlacementCount += 1;
     else standardPlacementCount += 1;
 
-    const dry = Math.min(1, Math.max(0, (1 - density - 0.15) * 1.2)) + (rng() < 0.1 ? 0.3 : 0);
+    const dry = Math.min(1, Math.max(0, (1 - density - 0.15) * 1.2 * (0.24 + rng() * 0.76)))
+      + (rng() < 0.1 ? 0.3 : 0);
     const forestHeightMul = density > 0.38 ? THREE.MathUtils.lerp(0.78, 0.94, density) : 1;
+    // Occasional sentinel tufts break the meadow canopy plane into layered
+    // heights. Scale-only, so no extra instances or draw calls.
+    const sentinel = rng() < 0.07 ? THREE.MathUtils.lerp(1.18, 1.42, rng()) : 1;
     const heightMul =
       (micro ? THREE.MathUtils.lerp(0.45, 0.72, rng()) : THREE.MathUtils.lerp(0.68, 1.08, rng())) *
-      forestHeightMul;
+      forestHeightMul *
+      sentinel;
     const height =
       heightMul *
       THREE.MathUtils.lerp(0.9, 1.06, density) *
@@ -1073,9 +1078,19 @@ function* generateSeedThreeChunkInstances(
     const rootY = heightAt(x, z) + 0.04;
     composeSeedThreeTuftMatrix(x, z, rootY, height, widthScale, rng, writeMatrix, writeQuaternion, writePosition, writeScale);
     const tint = sampleSeedThreeGrassTint(rng, dry);
+    // Per-instance presentation variety on top of the baked tuft gradient:
+    // a warm/cool split keeps adjacent tufts from blending into one flat tone,
+    // and a lightness jitter makes the meadow shimmer instead of repeating.
+    const warm = THREE.MathUtils.lerp(0.985, 1.115, rng());
+    const cool = THREE.MathUtils.lerp(0.955, 1.0, rng());
+    const brighten = THREE.MathUtils.lerp(0.93, 1.07, rng());
     instancesByMesh[variantIndex]!.push({
       matrix: writeMatrix.clone(),
-      tint: [tint.x, tint.y, tint.z],
+      tint: [
+        tint.x * warm * brighten,
+        tint.y * brighten,
+        tint.z * cool * brighten,
+      ],
       anchor: [x, rootY, z],
     });
     return true;
